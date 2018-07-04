@@ -25,7 +25,7 @@ export default class Map extends Component {
     componentDidMount() {
         this.watchID = navigator.geolocation.watchPosition((position) => {
             // Create the object to update this.state.mapRegion through the onRegionChange function
-            console.log(position.coords.latitude)
+            //console.log(position.coords.latitude)
             let region = {
                 latitude:       position.coords.latitude,
                 longitude:      position.coords.longitude,

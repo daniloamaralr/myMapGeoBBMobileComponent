@@ -4,11 +4,20 @@ import {
   StyleSheet,
   Text,
   View,
+  NativeModules
 } from 'react-native';
 import Map from 'Map';
 
+var nativeLocation = require('NativeModules').geoBBLocation;
+
 export default class Location {
-    // constructor(props){
+    static getPosition(latitude, longitude){
+        //fazer chamanda para nativo
+        nativeLocation.setPositionNative(latitude);
+    }
+}
+
+// constructor(props){
     //     super(props)
     //     this.state = {
     //         latitude:'',
@@ -16,11 +25,7 @@ export default class Location {
     //     }   
     // }
 
-    static getPosition(latitude, longitude){
-        console.log(latitude)
-        console.log('eitaa')
 
-    }
     
 
     // onUpdate = (latitude) => {
@@ -36,7 +41,6 @@ export default class Location {
     //     </View>
     //   );
     // }
-}
 
 // const styles = StyleSheet.create({
 //     container: {
