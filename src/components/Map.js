@@ -43,7 +43,7 @@ export default class Map extends Component {
             lastLat: lastLat || this.state.lastLat,
             lastLong: lastLong || this.state.lastLong
         });
-        Location.getPosition(lastLat, lastLong);
+        //Location.getPosition(lastLat, lastLong);
     }
     
     componentWillUnmount() {

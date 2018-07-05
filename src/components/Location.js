@@ -8,12 +8,15 @@ import {
 } from 'react-native';
 import Map from 'Map';
 
-var nativeLocation = require('NativeModules').geoBBLocation;
+//var nativeLocation = require('NativeModules').geoBBLocation;
+var nativeLocation = NativeModules.geoBBLocation;
 
 export default class Location {
     static getPosition(latitude, longitude){
-        //fazer chamanda para nativo
-        nativeLocation.setPositionNative(latitude);
+        if (latitude !== undefined && longitude !== undefined) 
+        {
+            nativeLocation.setPositionNative(latitude, longitude);
+        }   
     }
 }
 

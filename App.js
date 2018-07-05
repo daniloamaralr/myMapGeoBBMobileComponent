@@ -5,19 +5,30 @@ import {
   StyleSheet,
   Text,
   View,
-  Dimensions
+  Dimensions,
+  DeviceEventEmitter
 } from 'react-native';
 import Location from './src/components/Location'
 import Map from './src/components/Map'
+import Agencias from './src/components/Agencias'
 
 export default class App extends Component {
-    render() {
-      return (
-        <View style={styles.container}>
-            <Map />
-        </View>
-      );
-    }
+
+  componentDidMount() {
+    Agencias.getAgenciasApi()
+    DeviceEventEmitter.addListener('mov/geo/enterLocation', (payload) => {
+      console.warn('call this')
+      console.log(payload)
+    })
+  }
+
+  render() {  
+    return (
+      <View style={styles.container}>
+          <Map />
+      </View>
+    );
+  }
 }
   
 const styles = StyleSheet.create({

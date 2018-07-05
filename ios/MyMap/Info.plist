@@ -35,8 +35,6 @@
 			</dict>
 		</dict>
 	</dict>
-	<key>NSLocationWhenInUseUsageDescription</key>
-	<string></string>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>fetch</string>
@@ -57,5 +55,11 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>O Aplicativo deseja usar sua localização quando estiver ativo e segundo plano</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>O Aplicativo deseja usar sua localização mesmo em segundo plano</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>O Aplicativo CoreLoc deseja usar sua localização sempre</string>
 </dict>
 </plist>
