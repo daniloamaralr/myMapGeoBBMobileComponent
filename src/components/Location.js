@@ -18,6 +18,43 @@ export default class Location {
             nativeLocation.setPositionNative(latitude, longitude);
         }   
     }
+
+    static checkIn(payload, statusRegion){
+        console.log(payload.id)
+        const uri  = "http://localhost:8080/checkin/"
+    
+        var currentdate = new Date(); 
+        var datetime =  currentdate.getFullYear() + "-"
+                  + (currentdate.getMonth()+1)  + "-" 
+                  + currentdate.getDate() + " "  
+                  + currentdate.getHours() + ":"  
+                  + currentdate.getMinutes() + ":" 
+                  + currentdate.getSeconds();
+  
+        console.log(datetime)
+  
+        const requestInfo = {
+            method: 'POST',
+            body: JSON.stringify({
+                idfuncionario: 1,
+                idagencia: payload.id, 
+                hora : datetime,
+                regiao: statusRegion
+            }),
+            headers: new Headers({
+            'Content-type': 'application/json'
+            })
+        }
+  
+        fetch(uri, requestInfo)
+        .then(response => {
+            if(response.ok)
+             return response.text();
+  
+            console.log(response.text())
+            throw new Error("Não foi possível efetuar login")
+        })
+    }
 }
 
 // constructor(props){

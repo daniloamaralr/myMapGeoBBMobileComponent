@@ -16,9 +16,17 @@ export default class App extends Component {
 
   componentDidMount() {
     Agencias.getAgenciasApi()
+    
     DeviceEventEmitter.addListener('mov/geo/enterLocation', (payload) => {
-      console.warn('call this')
-      console.log(payload)
+      console.warn('enter region... log')
+      //console.log(payload)
+      Location.checkIn(payload,"entry");
+    })
+
+    DeviceEventEmitter.addListener('mov/geo/exitLocation', (payload) => {
+      console.warn('exit region... log')
+      //console.log(payload)
+      Location.checkIn(payload,"exit");
     })
   }
 

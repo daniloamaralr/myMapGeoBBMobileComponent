@@ -20,6 +20,8 @@
 
 @implementation geoBBLocation
 
+@synthesize bridge = _bridge;
+
 RCT_EXPORT_MODULE()
 
 - (instancetype)init
@@ -31,6 +33,10 @@ RCT_EXPORT_MODULE()
   self.locationManager.desiredAccuracy = kCLLocationAccuracyBest;
   //[locationManager requestWhenInUseAuthorization];
   [self.locationManager requestAlwaysAuthorization];
+  
+  for (CLRegion *cr in _locationManager.monitoredRegions) {
+        [self.locationManager stopMonitoringForRegion:cr];
+  }
   
   return self;
   
@@ -107,7 +113,7 @@ RCT_EXPORT_METHOD(setAgencias:(NSArray *)array) { //recebendo JSON das agencias
       double lng = [longitude doubleValue];
       int numR = [num intValue];
       CLLocationCoordinate2D geofenceRegionCenter = CLLocationCoordinate2DMake(lat, lng);
-      NSString *name = [[NSString alloc] initWithFormat:@"Regiao %d", numR];
+      NSString *name = [[NSString alloc] initWithFormat:@"%d", numR];
       CLCircularRegion *geofenceRegion =[[CLCircularRegion alloc] initWithCenter:geofenceRegionCenter radius:100.0 identifier:name];
       geofenceRegion.notifyOnExit = YES;
       geofenceRegion.notifyOnEntry = YES;
@@ -134,7 +140,7 @@ RCT_EXPORT_METHOD(setPlist){ //when dont have connection, read plist file
       double lng = [longitude doubleValue];
       int numR = [num intValue];
       CLLocationCoordinate2D geofenceRegionCenter = CLLocationCoordinate2DMake(lat, lng);
-      NSString *name = [[NSString alloc] initWithFormat:@"Regiao %d", numR];
+      NSString *name = [[NSString alloc] initWithFormat:@"%d", numR];
       CLCircularRegion *geofenceRegion =[[CLCircularRegion alloc] initWithCenter:geofenceRegionCenter radius:100.0 identifier:name];
       geofenceRegion.notifyOnExit = YES;
       geofenceRegion.notifyOnEntry = YES;
@@ -165,8 +171,10 @@ RCT_EXPORT_METHOD(setPlist){ //when dont have connection, read plist file
   CLLocationCoordinate2D center = ((CLCircularRegion *)region).center;
   NSString *latitude = [NSString stringWithFormat:@"%f", center.latitude];
   NSString *longitude = [NSString stringWithFormat:@"%f", center.longitude];
+  NSString *identifier = [NSString stringWithFormat:@"%@", region.identifier];
   
-  NSDictionary *payload = @{@"latitude": latitude, @"longitude": longitude};
+  
+  NSDictionary *payload = @{@"latitude": latitude, @"longitude": longitude, @"id":identifier};
   
   [self.bridge.eventDispatcher sendDeviceEventWithName:@"mov/geo/enterLocation" body:payload];
 }
@@ -187,6 +195,17 @@ RCT_EXPORT_METHOD(setPlist){ //when dont have connection, read plist file
   localNotification.timeZone = [NSTimeZone defaultTimeZone];
   localNotification.soundName = UILocalNotificationDefaultSoundName;
   [[UIApplication sharedApplication] scheduleLocalNotification:localNotification];
+  
+  //enter region... send to react
+  CLLocationCoordinate2D center = ((CLCircularRegion *)region).center;
+  NSString *latitude = [NSString stringWithFormat:@"%f", center.latitude];
+  NSString *longitude = [NSString stringWithFormat:@"%f", center.longitude];
+  NSString *identifier = [NSString stringWithFormat:@"%@", region.identifier];
+  
+  
+  NSDictionary *payload = @{@"latitude": latitude, @"longitude": longitude, @"id":identifier};
+  
+  [self.bridge.eventDispatcher sendDeviceEventWithName:@"mov/geo/exitLocation" body:payload];
 }
 
 @end

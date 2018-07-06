@@ -13,7 +13,7 @@ var nativeLocation = NativeModules.geoBBLocation;
 
 export default class Location {
     static getAgenciasApi(){
-        console.log('entrou aqui')
+        //console.log('entrou aqui')
         fetch('http://localhost:8080/listaagencias')
         .then(resposta => resposta.json())  
         .then(json => {
