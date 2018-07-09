@@ -39,6 +39,10 @@ RCT_EXPORT_MODULE()
         [self.locationManager stopMonitoringForRegion:cr];
   }
   
+  defaults = [NSUserDefaults standardUserDefaults];
+  UIUserNotificationType types = UIUserNotificationTypeBadge | UIUserNotificationTypeSound | UIUserNotificationTypeAlert;
+  UIUserNotificationSettings *mySettings = [UIUserNotificationSettings settingsForTypes:types categories:nil];
+  [[UIApplication sharedApplication] registerUserNotificationSettings:mySettings];
   
   return self;
 }
@@ -94,7 +98,8 @@ RCT_EXPORT_MODULE()
 //  [self.locationManager startUpdatingLocation];
 //
 //}
-RCT_EXPORT_METHOD(setAgenciasFirebase:(NSDictionary *)array) { //recebendo JSON das agencias
+
+RCT_EXPORT_METHOD(setAgenciasFirebase:(NSDictionary *)array) { //when connect with firebase
   _dicFirebase = array;
   NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
   NSString *documentsDirectory = [paths objectAtIndex:0];
@@ -122,7 +127,7 @@ RCT_EXPORT_METHOD(setAgenciasFirebase:(NSDictionary *)array) { //recebendo JSON 
   }
 }
 
-RCT_EXPORT_METHOD(setAgencias:(NSArray *)array) { //recebendo JSON das agencias
+RCT_EXPORT_METHOD(setAgencias:(NSArray *)array) { //receiveing json from api
   _arr = array;
   NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
   NSString *documentsDirectory = [paths objectAtIndex:0];
@@ -149,7 +154,7 @@ RCT_EXPORT_METHOD(setAgencias:(NSArray *)array) { //recebendo JSON das agencias
   }
 }
 
-RCT_EXPORT_METHOD(setPlist){ //when dont have connection, read plist file
+RCT_EXPORT_METHOD(setPlist){ //when dont have connection with api, read plist file
   NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
   NSString *documentsDirectory = [paths objectAtIndex:0];
   NSString *plistPath = [documentsDirectory stringByAppendingPathComponent:@"agencias.plist"];
@@ -199,8 +204,7 @@ RCT_EXPORT_METHOD(setPlist){ //when dont have connection, read plist file
   NSString *latitude = [NSString stringWithFormat:@"%f", center.latitude];
   NSString *longitude = [NSString stringWithFormat:@"%f", center.longitude];
   NSString *identifier = [NSString stringWithFormat:@"%@", region.identifier];
-  
-  
+
   NSDictionary *payload = @{@"latitude": latitude, @"longitude": longitude, @"id":identifier};
   
   [self.bridge.eventDispatcher sendDeviceEventWithName:@"mov/geo/enterLocation" body:payload];
@@ -209,6 +213,7 @@ RCT_EXPORT_METHOD(setPlist){ //when dont have connection, read plist file
 -(void)locationManager:(CLLocationManager *)manager didExitRegion:(CLRegion *)region {
   
   NSString *mensagem = [[NSString alloc] initWithFormat:@"Exit region: %f - %f", region.center.latitude, region.center.longitude];
+  
   UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"GEO" message:mensagem preferredStyle:UIAlertControllerStyleAlert];
   UIAlertAction* okButton = [UIAlertAction
                              actionWithTitle:@"OK"
