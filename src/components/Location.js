@@ -1,58 +1,43 @@
 import React from 'react';
 import {
-  Platform,
-  StyleSheet,
-  Text,
-  View,
-  NativeModules
+    Platform,
+    StyleSheet,
+    Text,
+    View,
+    NativeModules,
+    DeviceEventEmitter
 } from 'react-native';
-import Map from 'Map';
+import Map from './Map';
+import Api from './Api';
+import Firebase from './Firebase'
 
 //var nativeLocation = require('NativeModules').geoBBLocation;
 var nativeLocation = NativeModules.geoBBLocation;
 
 export default class Location {
-    static getPosition(latitude, longitude){
-        if (latitude !== undefined && longitude !== undefined) 
-        {
+    static getPosition(latitude, longitude) {
+        if (latitude !== undefined && longitude !== undefined) {
             nativeLocation.setPositionNative(latitude, longitude);
-        }   
+        }
     }
 
-    static checkIn(payload, statusRegion){
-        console.log(payload.id)
-        const uri  = "http://localhost:8080/checkin/"
-    
-        var currentdate = new Date(); 
-        var datetime =  currentdate.getFullYear() + "-"
-                  + (currentdate.getMonth()+1)  + "-" 
-                  + currentdate.getDate() + " "  
-                  + currentdate.getHours() + ":"  
-                  + currentdate.getMinutes() + ":" 
-                  + currentdate.getSeconds();
-  
-        console.log(datetime)
-  
-        const requestInfo = {
-            method: 'POST',
-            body: JSON.stringify({
-                idfuncionario: 1,
-                idagencia: payload.id, 
-                hora : datetime,
-                regiao: statusRegion
-            }),
-            headers: new Headers({
-            'Content-type': 'application/json'
-            })
-        }
-  
-        fetch(uri, requestInfo)
-        .then(response => {
-            if(response.ok)
-             return response.text();
-  
-            console.log(response.text())
-            throw new Error("Não foi possível efetuar login")
+    static didEnterOrExitListener(database) {
+        DeviceEventEmitter.addListener('mov/geo/enterLocation', (payload) => {
+            console.warn('enter region... log')
+            if (database == 'api') {
+                Api.checkIn(payload, 'enter');
+            } else if (database == 'firebase') {
+                Firebase.checkIn(payload, 'enter');
+            }
+        })
+
+        DeviceEventEmitter.addListener('mov/geo/exitLocation', (payload) => {
+            console.warn('exit region... log')
+            if (database == 'api') {
+                Api.checkIn(payload, 'exit');
+            } else if (database == 'firebase') {
+                Firebase.checkIn(payload, 'exit');
+            }
         })
     }
 }
@@ -66,7 +51,7 @@ export default class Location {
     // }
 
 
-    
+
 
     // onUpdate = (latitude) => {
     //     this.setState({

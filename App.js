@@ -8,40 +8,48 @@ import {
   Dimensions,
   DeviceEventEmitter
 } from 'react-native';
+
+//Componentes
 import Location from './src/components/Location'
 import Map from './src/components/Map'
-import Agencias from './src/components/Agencias'
+import Api from './src/components/Api'
+import Firebase from './src/components/Firebase'
+
+const SELECT_DATABASE = 'firebase';
 
 export default class App extends Component {
 
-  componentDidMount() {
-    Agencias.getAgenciasApi()
-    
-    DeviceEventEmitter.addListener('mov/geo/enterLocation', (payload) => {
-      console.warn('enter region... log')
-      //console.log(payload)
-      Location.checkIn(payload,"entry");
-    })
+  componentWillMount() {
+    if (SELECT_DATABASE == 'firebase') {
+      Firebase.configFirebase();
+      Firebase.loadAgencies();
 
-    DeviceEventEmitter.addListener('mov/geo/exitLocation', (payload) => {
-      console.warn('exit region... log')
-      //console.log(payload)
-      Location.checkIn(payload,"exit");
-    })
+      Location.didEnterOrExitListener(SELECT_DATABASE);
+    }
+    else if (SELECT_DATABASE == 'api') {
+      Api.getAgenciasApi()
+      Location.didEnterOrExitListener(SELECT_DATABASE);
+    }
+    else{
+      console.warn('Load Database Failed')
+    }
+    
+
+    //Firebase.insertFirebase();
   }
 
-  render() {  
+  render() {
     return (
       <View style={styles.container}>
-          <Map />
+        <Map />
       </View>
     );
   }
 }
-  
+
 const styles = StyleSheet.create({
   container: {
-    marginTop: 20,  
+    marginTop: 20,
   },
 });
 
@@ -82,7 +90,7 @@ const styles = StyleSheet.create({
 //         { enableHighAccuracy: true, timeout: 10000, maximumAge: 1000, distanceFilter: 10 },
 //       );
 //     }
-      
+
 //     render() {
 //       return (
 //         <MapView style={styles.map} initialRegion={{
@@ -91,16 +99,16 @@ const styles = StyleSheet.create({
 //          latitudeDelta: 1,
 //          longitudeDelta: 1
 //         }}>
-    
+
 //         {!!this.state.latitude && !!this.state.longitude && <MapView.Marker
 //            coordinate={{"latitude":this.state.latitude,"longitude":this.state.longitude}}
 //            title={"Your Location"}
 //          />}
-  
+
 //         </MapView>
 //       );
 //     }
-    
+
 // }
 
 // const styles = {
@@ -147,7 +155,7 @@ const styles = StyleSheet.create({
 //             lastLong: null
 //         }   
 //     }
-    
+
 //     componentDidMount() {
 //         this.watchID = navigator.geolocation.watchPosition((position) => {
 //             // Create the object to update this.state.mapRegion through the onRegionChange function
@@ -161,7 +169,7 @@ const styles = StyleSheet.create({
 //             this.onRegionChange(region, region.latitude, region.longitude);
 //         });
 //     }
-    
+
 //     onRegionChange(region, lastLat, lastLong) {
 //         this.setState({
 //             mapRegion: region,
@@ -170,11 +178,11 @@ const styles = StyleSheet.create({
 //             lastLong: lastLong || this.state.lastLong
 //         });
 //     }
-    
+
 //     componentWillUnmount() {
 //         navigator.geolocation.clearWatch(this.watchID);
 //     }
-    
+
 //     onMapPress(e) {
 //         console.log(e.nativeEvent.coordinate.longitude);
 //         let region = {
@@ -185,7 +193,7 @@ const styles = StyleSheet.create({
 //         }
 //         this.onRegionChange(region, region.latitude, region.longitude);
 //     }
-    
+
 //     render() {
 //         return (
 //             <View style = {styles.container}>
@@ -208,7 +216,7 @@ const styles = StyleSheet.create({
 //         );
 //     }
 // }
-    
+
 // const styles = StyleSheet.create({
 //   container: {
 //     position: 'absolute',

@@ -14,6 +14,7 @@
 @interface geoBBLocation() {
   NSArray *_arr;
   NSArray *_dic;
+  NSDictionary *_dicFirebase;
   NSUserDefaults *defaults;
 }
 @end
@@ -38,8 +39,8 @@ RCT_EXPORT_MODULE()
         [self.locationManager stopMonitoringForRegion:cr];
   }
   
-  return self;
   
+  return self;
 }
 
 - (void)locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray<CLLocation *> *)locations {
@@ -93,7 +94,33 @@ RCT_EXPORT_MODULE()
 //  [self.locationManager startUpdatingLocation];
 //
 //}
-
+RCT_EXPORT_METHOD(setAgenciasFirebase:(NSDictionary *)array) { //recebendo JSON das agencias
+  _dicFirebase = array;
+  NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+  NSString *documentsDirectory = [paths objectAtIndex:0];
+  NSString *plistPath = [documentsDirectory stringByAppendingPathComponent:@"agencias.plist"];
+  NSLog(@"%@", plistPath);
+  [array writeToFile:plistPath atomically: YES];
+  
+  //criando geofences
+  for (NSString *key in _dicFirebase) {
+    NSDictionary *dic = _dicFirebase[key];
+    id latitude = [dic valueForKey:@"latitude"];
+    id longitude = [dic valueForKey:@"longitude"];
+    id num = [dic valueForKey:@"id"];
+    if (latitude && longitude && num) {
+      double lat = [latitude doubleValue];
+      double lng = [longitude doubleValue];
+      int numR = [num intValue];
+      CLLocationCoordinate2D geofenceRegionCenter = CLLocationCoordinate2DMake(lat, lng);
+      NSString *name = [[NSString alloc] initWithFormat:@"%d", numR];
+      CLCircularRegion *geofenceRegion =[[CLCircularRegion alloc] initWithCenter:geofenceRegionCenter radius:100.0 identifier:name];
+      geofenceRegion.notifyOnExit = YES;
+      geofenceRegion.notifyOnEntry = YES;
+      [self.locationManager startMonitoringForRegion:geofenceRegion];
+    }
+  }
+}
 
 RCT_EXPORT_METHOD(setAgencias:(NSArray *)array) { //recebendo JSON das agencias
   _arr = array;
